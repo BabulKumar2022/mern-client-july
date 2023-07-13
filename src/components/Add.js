@@ -11,6 +11,7 @@ const Add = () => {
     },[])
   
     const handleAddUser = event =>{
+      
       event.preventDefault();
       const name = event.target.name.value;
       const email = event.target.email.value;
@@ -26,6 +27,7 @@ const Add = () => {
       })
       .then(res => res.json())
       .then(data => {
+
         console.log( 'success',data)
         alert('one user added successfully')
 
@@ -33,12 +35,32 @@ const Add = () => {
       .catch(err => console.log(err))
       event.target.reset()
     }
+    const handleDelete = id =>{
+      const proceed = window.confirm('Are you sure you want to delete?')
+      if(proceed){
+        console.log('deleting id is', id);
+        const url = `http://localhost:5000/users/${id}`;
+        fetch(url,{
+          method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data =>{
+          if(data.deletedCount > 0){
+            console.log('deleted');
+            const remaining = users.filter(user => user._id !== id)
+            setUsers(remaining)
+          }
+        
+        })
+      }
+     
+    }
   return (
     <div>
         <form onSubmit={handleAddUser}>
         <input type="text" name="name" placeholder='Name' />
         <br />
-        <input type="email" name="email" placeholder='email'/>
+        <input type="email" name="email" placeholder='email' className='email-input'/>
         <br />
         <button type="submit">Add User</button>
       </form>
@@ -46,7 +68,11 @@ const Add = () => {
       <h2>Users: {users.length}</h2>
       <div className="">
         {
-          users.map(user => <p key={user._id}>Name:{user.name} Email: {user.email} {user.phone}</p>)
+          users.map(user => <p key={user._id}>
+            Name: {user.name} 
+             Email: {user.email} 
+             <button onClick={()=>handleDelete(user._id)}>X</button>
+              </p>)
         }
       </div>
     </div>
